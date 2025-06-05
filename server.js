@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
@@ -11,15 +10,14 @@ const API_URL = "https://lineage.api.ndustrial.io/graphql";
 const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 
 app.post("/api/demand", async (req, res) => {
-  // 1) Read `from` and `to` from request body
+  console.log("Proxy received:", req.body);
   const { from, to } = req.body;
   if (!from || !to) {
     return res.status(400).json({
-      error: "Request body must include `from` and `to` (ISO strings) 2."
+      error: "Request body must include `from` and `to` (ISO strings)."
     });
   }
 
-  // 2) Build GraphQL payload with dynamic `from`/`to`
   const graphqlQuery = {
     query: `
       query(
