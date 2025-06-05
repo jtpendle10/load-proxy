@@ -10,14 +10,14 @@ app.use(cors());
 const API_URL = "https://lineage.api.ndustrial.io/graphql";
 const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 
-app.post("/api/demand", async (req, res) => {
+//app.post("/api/demand", async (req, res) => {
   // Read `fromValue` and `toValue` from request body
-  const { fromValue, toValue } = req.body;
-  if (!fromValue || !toValue) {
-    return res.status(400).json({
-      error: "Request body must include `fromValue` and `toValue` (ISO strings)."
-    });
-  }
+//  const { fromValue, toValue } = req.body;
+//  if (!fromValue || !toValue) {
+//    return res.status(400).json({
+//      error: "Request body must include `fromValue` and `toValue` (ISO strings)."
+//    });
+//  }
 
   // Build GraphQL query payload, injecting dynamic `from` and `to`
   const graphqlQuery = {
