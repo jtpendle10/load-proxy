@@ -12,11 +12,6 @@ const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 app.post("/api/demand", async (req, res) => {
   console.log("Proxy received:", req.body);
   const { from, to } = req.body;
-  if (!from || !to) {
-    return res.status(400).json({
-      error: "Request body must include `from` and `to` (ISO strings)."
-    });
-  }
 
   const graphqlQuery = {
     query: `
