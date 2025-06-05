@@ -11,26 +11,38 @@ const API_URL = "https://lineage.api.ndustrial.io/graphql";
 const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 
 app.post("/api/demand", async (req, res) => {
-  //
-  // Read `from` and `to` from request body:
-  //
+  // Read `fromValue` and `toValue` from request body
   const { fromValue, toValue } = req.body;
   if (!fromValue || !toValue) {
     return res.status(400).json({
-      error: "Request body must include `from` and `to` (ISO strings)."
+      error: "Request body must include `fromValue` and `toValue` (ISO strings)."
     });
   }
 
   // Build GraphQL query payload, injecting dynamic `from` and `to`
   const graphqlQuery = {
     query: `
-      query($facilityId: Int!, $from: String!, $to: String!, $aggregation: MetricDataAggregationMethod!, $window: String!, $samplingWindow: String, $filter: MainServiceFilter) {
+      query(
+        $facilityId: Int!, 
+        $from: String!, 
+        $to: String!, 
+        $aggregation: MetricDataAggregationMethod!, 
+        $window: String!, 
+        $samplingWindow: String, 
+        $filter: MainServiceFilter
+      ) {
         facility(id: $facilityId) {
           mainServices(filter: $filter) {
             nodes {
               name
               demand {
-                data(from: $from, to: $to, aggregation: $aggregation, window: $window, samplingWindow: $samplingWindow) {
+                data(
+                  from: $from, 
+                  to: $to, 
+                  aggregation: $aggregation, 
+                  window: $window, 
+                  samplingWindow: $samplingWindow
+                ) {
                   totalCount
                   nodes {
                     data
@@ -45,8 +57,8 @@ app.post("/api/demand", async (req, res) => {
     `,
     variables: {
       facilityId: 19,
-      from: fromValue,                // ← dynamic
-      to toValue,                  // ← dynamic
+      from: fromValue,       // ← use the value from req.body.fromValue
+      to:   toValue,         // ← add missing colon here
       aggregation: "MAX",
       window: "15 minutes",
       samplingWindow: "15 minutes",
@@ -57,16 +69,12 @@ app.post("/api/demand", async (req, res) => {
   };
 
   try {
-    const response = await axios.post(
-      API_URL,
-      graphqlQuery,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": FALLBACK_API_TOKEN
-        }
+    const response = await axios.post(API_URL, graphqlQuery, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": FALLBACK_API_TOKEN
       }
-    );
+    });
     return res.status(200).json(response.data);
   } catch (err) {
     console.error("Error fetching GraphQL:", err.response?.data || err.message);
