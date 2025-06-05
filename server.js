@@ -10,25 +10,25 @@ app.use(cors());
 const API_URL = "https://lineage.api.ndustrial.io/graphql";
 const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 
-//app.post("/api/demand", async (req, res) => {
-  // Read `fromValue` and `toValue` from request body
-//  const { fromValue, toValue } = req.body;
-//  if (!fromValue || !toValue) {
-//    return res.status(400).json({
-//      error: "Request body must include `fromValue` and `toValue` (ISO strings)."
-//    });
-//  }
+app.post("/api/demand", async (req, res) => {
+  // 1) Read `from` and `to` from request body
+  const { from, to } = req.body;
+  if (!from || !to) {
+    return res.status(400).json({
+      error: "Request body must include `from` and `to` (ISO strings)."
+    });
+  }
 
-  // Build GraphQL query payload, injecting dynamic `from` and `to`
+  // 2) Build GraphQL payload with dynamic `from`/`to`
   const graphqlQuery = {
     query: `
       query(
-        $facilityId: Int!, 
-        $from: String!, 
-        $to: String!, 
-        $aggregation: MetricDataAggregationMethod!, 
-        $window: String!, 
-        $samplingWindow: String, 
+        $facilityId: Int!,
+        $from: String!,
+        $to: String!,
+        $aggregation: MetricDataAggregationMethod!,
+        $window: String!,
+        $samplingWindow: String,
         $filter: MainServiceFilter
       ) {
         facility(id: $facilityId) {
@@ -37,10 +37,10 @@ const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
               name
               demand {
                 data(
-                  from: $from, 
-                  to: $to, 
-                  aggregation: $aggregation, 
-                  window: $window, 
+                  from: $from,
+                  to: $to,
+                  aggregation: $aggregation,
+                  window: $window,
                   samplingWindow: $samplingWindow
                 ) {
                   totalCount
@@ -57,8 +57,8 @@ const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
     `,
     variables: {
       facilityId: 19,
-      from: fromValue,       // ← use the value from req.body.fromValue
-      to:   toValue,         // ← add missing colon here
+      from,
+      to,
       aggregation: "MAX",
       window: "15 minutes",
       samplingWindow: "15 minutes",
