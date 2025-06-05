@@ -5,14 +5,23 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // allow all origins
+app.use(cors());
 
-// === Integrate your auth constants ===
 const API_URL = "https://lineage.api.ndustrial.io/graphql";
 const FALLBACK_API_TOKEN = "token niou_YkiaMScYAxbh4fwn3Mx2Hpzeh3n9Va5UBVSW";
 
 app.post("/api/demand", async (req, res) => {
-  // We mirror the GraphQL query from your curl, but now include Authorization.
+  //
+  // Read `from` and `to` from request body:
+  //
+  const { from, to } = req.body;
+  if (!from || !to) {
+    return res.status(400).json({
+      error: "Request body must include `from` and `to` (ISO strings)."
+    });
+  }
+
+  // Build GraphQL query payload, injecting dynamic `from` and `to`
   const graphqlQuery = {
     query: `
       query($facilityId: Int!, $from: String!, $to: String!, $aggregation: MetricDataAggregationMethod!, $window: String!, $samplingWindow: String, $filter: MainServiceFilter) {
@@ -36,8 +45,8 @@ app.post("/api/demand", async (req, res) => {
     `,
     variables: {
       facilityId: 19,
-      from: "2025-04-01T00:00:00",
-      to:   "2025-04-30T00:00:00",
+      from,                // ← dynamic
+      to,                  // ← dynamic
       aggregation: "MAX",
       window: "15 minutes",
       samplingWindow: "15 minutes",
@@ -58,8 +67,6 @@ app.post("/api/demand", async (req, res) => {
         }
       }
     );
-
-    // Forward the GraphQL JSON exactly as returned
     return res.status(200).json(response.data);
   } catch (err) {
     console.error("Error fetching GraphQL:", err.response?.data || err.message);
@@ -70,7 +77,6 @@ app.post("/api/demand", async (req, res) => {
   }
 });
 
-// Render will set PORT automatically; fallback to 3000 for local dev
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Proxy server listening on port ${PORT}`);
