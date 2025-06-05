@@ -15,7 +15,7 @@ app.post("/api/demand", async (req, res) => {
   const { from, to } = req.body;
   if (!from || !to) {
     return res.status(400).json({
-      error: "Request body must include `from` and `to` (ISO strings)."
+      error: "Request body must include `from` and `to` (ISO strings) 2."
     });
   }
 
