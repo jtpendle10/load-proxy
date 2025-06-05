@@ -14,8 +14,8 @@ app.post("/api/demand", async (req, res) => {
   //
   // Read `from` and `to` from request body:
   //
-  const { from, to } = req.body;
-  if (!from || !to) {
+  const { fromValue, toValue } = req.body;
+  if (!fromValue || !toValue) {
     return res.status(400).json({
       error: "Request body must include `from` and `to` (ISO strings)."
     });
@@ -45,8 +45,8 @@ app.post("/api/demand", async (req, res) => {
     `,
     variables: {
       facilityId: 19,
-      from,                // ← dynamic
-      to,                  // ← dynamic
+      from: fromValue,                // ← dynamic
+      to toValue,                  // ← dynamic
       aggregation: "MAX",
       window: "15 minutes",
       samplingWindow: "15 minutes",
